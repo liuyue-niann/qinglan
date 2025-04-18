@@ -1,4 +1,4 @@
-let key = "sk-498918c709a2402990333eaf30995c33";
+let key = "";
 let base_url = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions";
 
 
