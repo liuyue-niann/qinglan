@@ -1,4 +1,4 @@
-let key = "";
+let key = "sk-498918c709a2402990333eaf30995c33";
 let base_url = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions";
 
 
@@ -21,10 +21,8 @@ async function getOptionAndAnswer() {
 
     if (titleType.includes("单选题")) {
         let prompt = `我给你一个题目和选项，你直接返回A、B、C、D就行:题目:${getTitle()}\r\n ${list}`;
-        console.log("题目:" + getTitle());
         try {
             let result = await callQwenApi(prompt);
-            console.log("答案:" + result);
             let temp = result.trim()[0];
             if (temp == "A") optionList[0].click();
             else if (temp == "B") optionList[1].click();
@@ -36,13 +34,10 @@ async function getOptionAndAnswer() {
         }
 
     } else if (titleType.includes("填空题")) {
-        console.log(getTitle() + "/r" + list);
 
         let prompt = `我给你一个填空题，你直接返回答案中间用空格分隔其他信息都不要，如果有选项就返回正确的选项(ABCD)不要返回选项的值 题目:${getTitle()}\r\n ${list}`;
-        console.log("题目:" + getTitle());
         try {
             let result = await callQwenApi(prompt);
-            console.log("答案:" + result);
             result= result.replace(/\s+/g, '');
             for (let i = 0; i < result.length; i++) {
                 // 获取 input 元素
@@ -58,14 +53,15 @@ async function getOptionAndAnswer() {
         }
 
     } else {
-        console.log("暂不支持该题型，跳过");
+        console.error("-------------暂不支持此题型请手动填入----------------");
+        console.log(result);
+        await delay(1000*10); // 等待一秒点击下一题
     }
 }
 
 async function startLoop() {
     const liElements = document.querySelectorAll("#__layout > div > div > div.answer_content > div > div > div.answerArea > div.answerArea_right > div > div.answer_num_card > div.answer_num_card_area > div.ques_num_box.scrollbar > ul li");
     for (let i = 0; i < liElements.length; i++) {
-
         await getOptionAndAnswer();
         await delay(1000); // 等待一秒点击下一题
         let nextBtn = document.querySelector("#__layout > div > div > div.answer_content > div > div > div.answerArea > div.answerArea_left > div.btn_box > div > button:nth-child(3)");
@@ -80,21 +76,19 @@ async function startLoop() {
 
 async function startOne() {
     await getOptionAndAnswer();
-    await delay(1000); // 等待一秒点击下一题
-    if (nextBtn) nextBtn.click();
-    else {
-        console.log("未找到下一题按钮，可能到头了");
-    }
     await delay(1500); // 等页面加载完再处理下一题
 }
 
+async function callQwenApiv2(text) {
+    let response = await fetch("http://localhost:8080/")
+}
 
 async function callQwenApi(promptText) {
     const url = base_url;
     const apiKey = key;
 
     const requestBody = {
-        model: "qwen-turbo",
+        model: "qwen-max",
         messages: [
             {
                 role: "system",
@@ -122,7 +116,7 @@ async function callQwenApi(promptText) {
 
 function init() {
     // 启动循环刷题
-    startLoop();
-    // startOne();
+    // startLoop();
+    startOne();
 }
 init()
